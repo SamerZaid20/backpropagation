@@ -1,0 +1,49 @@
+import math
+def sigmoid(x):
+    return 1 / (1 + math.exp(-x))
+
+def sigmoid_derivative(x):
+    return x * (1 - x)
+
+inputs = [0.05, 0.10] 
+expected_output = [0.01, 0.99] 
+
+weights = {
+    'w1': 0.15, 'w2': 0.20, 'w3': 0.25, 'w4': 0.30,
+    'w5': 0.40, 'w6': 0.45, 'w7': 0.50, 'w8': 0.55
+}
+
+biases = {'b1': 0.35, 'b2': 0.60}
+
+h1_input = inputs[0] * weights['w1'] + inputs[1] * weights['w3'] + biases['b1']
+h2_input = inputs[0] * weights['w2'] + inputs[1] * weights['w4'] + biases['b1']
+h1_output = sigmoid(h1_input)
+h2_output = sigmoid(h2_input)
+
+o1_input = h1_output * weights['w5'] + h2_output * weights['w7'] + biases['b2']
+o2_input = h1_output * weights['w6'] + h2_output * weights['w8'] + biases['b2']
+o1_output = sigmoid(o1_input)
+o2_output = sigmoid(o2_input)
+
+error = 0.5 * ((expected_output[0] - o1_output) ** 2 + (expected_output[1] - o2_output) ** 2)
+
+delta_o1 = (o1_output - expected_output[0]) * sigmoid_derivative(o1_output)
+delta_o2 = (o2_output - expected_output[1]) * sigmoid_derivative(o2_output)
+
+delta_h1 = (delta_o1 * weights['w5'] + delta_o2 * weights['w6']) * sigmoid_derivative(h1_output)
+delta_h2 = (delta_o1 * weights['w7'] + delta_o2 * weights['w8']) * sigmoid_derivative(h2_output)
+
+learning_rate = 0.5
+
+weights['w5'] -= learning_rate * delta_o1 * h1_output
+weights['w6'] -= learning_rate * delta_o1 * h2_output
+weights['w7'] -= learning_rate * delta_o2 * h1_output
+weights['w8'] -= learning_rate * delta_o2 * h2_output
+
+weights['w1'] -= learning_rate * delta_h1 * inputs[0]
+weights['w2'] -= learning_rate * delta_h1 * inputs[1]
+weights['w3'] -= learning_rate * delta_h2 * inputs[0]
+weights['w4'] -= learning_rate * delta_h2 * inputs[1]
+
+
+print("Updated Weights:", weights)
